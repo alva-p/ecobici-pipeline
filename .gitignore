@@ -1,0 +1,10 @@
+# Datos pesados: se regeneran con `python main.py` (ver README)
+data/raw/*
+data/bronze/
+data/silver/
+data/gold/*
+!data/gold/reportes/
+!data/raw/.gitkeep
+.venv/
+__pycache__/
+.ipynb_checkpoints/

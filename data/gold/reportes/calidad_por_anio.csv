@@ -1,0 +1,4 @@
+anio,filas_bronze,filas_silver,filas_cuarentena,porcentaje_cuarentena,cuarentena_duplicado,cuarentena_duracion_mayor_24h,cuarentena_estacion_nula,cuarentena_fecha_invalida
+2016,596807,503252,93555,15.68,0,0,0,93555
+2019,6217004,6207851,9153,0.15,0,7393,1760,0
+2024,3559284,3555217,4067,0.11,1,687,0,3379

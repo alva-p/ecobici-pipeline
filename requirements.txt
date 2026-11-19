@@ -1,0 +1,7 @@
+# Pipeline (python main.py)
+pandas>=2.2
+pyarrow>=15
+# Extras: informe.ipynb y consultas SQL
+matplotlib>=3.8
+duckdb>=1.0
+jupyter>=1.0
