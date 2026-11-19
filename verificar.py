@@ -1,4 +1,10 @@
-"""Verificaciones del pipeline (sin frameworks: solo asserts).
+"""Verificaciones del pipeline (sin frameworks de testing: solo asserts).
+
+Lo dividí en tres partes:
+  - reglas_unitarias(): pruebo cada transformación con datos chiquitos armados a mano, donde sé
+    exactamente qué tiene que salir. Si alguien cambia una regla sin querer, esto lo detecta.
+  - salidas(): compruebo lo que pide el enunciado sobre los datos reales ya procesados.
+  - idempotencia(): corro el pipeline dos veces y comparo (D19).
 
     python verificar.py                 # reglas unitarias + salidas ya generadas
     python verificar.py --idempotencia  # además corre el pipeline 2 veces y compara
@@ -34,6 +40,8 @@ def reglas_unitarias():
     g = pd.Series(["FEMALE", "Male", "f", "OTHER", "X", "", "raro"]).str.upper().map(silver.MAPEO_GENERO).fillna("DESCONOCIDO")
     check("mapeo de género", g.tolist() == ["F", "M", "F", "OTRO", "OTRO", "DESCONOCIDO", "DESCONOCIDO"])
 
+    # Armé 6 viajes donde cada uno falla una regla distinta, para probar el ORDEN de las reglas.
+    # El primero falla dos reglas (fecha nula y estación nula): tiene que quedar solo FECHA_INVALIDA.
     t = pd.Timestamp
     df = pd.DataFrame({
         "id_viaje": pd.array(["1", "2", "3", "4", "4", "5"], dtype="string"),
@@ -80,7 +88,9 @@ def salidas():
 
 
 def huella() -> dict:
-    """Hash del contenido de cada tabla, sin _fecha_ingesta (que cambia en cada corrida a propósito)."""
+    """Hash del contenido de cada tabla, sin _fecha_ingesta (que cambia en cada corrida a propósito).
+    Comparar hashes es más rápido y más estricto que comparar solo cantidades de filas:
+    si cambia un solo valor en cualquier tabla, el hash cambia."""
     h = {}
     for p in sorted(list(BRONZE.rglob("*.parquet")) + list(SILVER.rglob("*.parquet")) + list(GOLD.rglob("*.parquet"))):
         df = pd.read_parquet(p)
