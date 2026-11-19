@@ -11,6 +11,11 @@ de **2016, 2019 y 2024**, tal como los publica el portal de datos abiertos, y lo
 - **27 verificaciones automáticas** (`python verificar.py`): conciliación, esquema, unicidad, integridad referencial e idempotencia.
 - Cada decisión que no estaba en el enunciado está justificada en **[DECISIONES.md](DECISIONES.md)**.
 
+> **Cómo leer este trabajo.** Este README es el informe del TP: explica qué hace el pipeline, qué encontré en los
+> datos y a qué conclusiones llegué (al final). Para el detalle hay tres lugares más:
+> [DECISIONES.md](DECISIONES.md) (por qué hice cada cosa, con links a la línea de código),
+> [informe.ipynb](informe.ipynb) (gráficos y consultas SQL) y [`src/`](src) (el código, comentado).
+
 ---
 
 ## Arquitectura
@@ -80,11 +85,11 @@ Los tres años **no comparten formato**. Estos son los problemas que tuvo que re
 
 | Problema | Dónde | Cómo se resolvió |
 |---|---|---|
-| **Los ids de estación cambian de significado.** En 2016 el id es el número público y desde 2019 es un id interno: el id 59 es "Coronel Díaz" en 2016 e "Independencia" después | 2016 vs 2019/2024 | Reconciliación por nombre + distancia (≤ 300 m), con una tabla de equivalencias auditable ([D3](DECISIONES.md#silver-viajes)) |
-| **La duración de 2016 no coincide con sus fechas** (correlación 0,002) | 2016 | Se recalcula como fin − inicio ([D4](DECISIONES.md#silver-viajes)) |
+| **Los ids de estación cambian de significado.** En 2016 el id es el número público y desde 2019 es un id interno: el id 59 es "Coronel Díaz" en 2016 e "Independencia" después | 2016 vs 2019/2024 | Reconciliación por nombre + distancia (≤ 300 m), con una tabla de equivalencias auditable ([D3](DECISIONES.md#d3)) |
+| **La duración de 2016 no coincide con sus fechas** (correlación 0,002) | 2016 | Se recalcula como fin − inicio ([D4](DECISIONES.md#d4)) |
 | Duración con coma de miles: `"2,814"` | 2019 | Se limpia antes de convertir a número |
 | Ids con sufijo (`6243BAEcobici`) o como float (`992557.0`) | 2019 / 2024 | Se normalizan a texto limpio |
-| Nombres con prefijo, tildes y espacios dobles (`"019 - PLAZA  SAN MARTIN"`, `"Pacífico"`) | todos | Una sola normalización ([D5](DECISIONES.md#silver-viajes)) |
+| Nombres con prefijo, tildes y espacios dobles (`"019 - PLAZA  SAN MARTIN"`, `"Pacífico"`) | todos | Una sola normalización ([D5](DECISIONES.md#d5)) |
 | Nombres provisorios de estación (`KP1808000368`, `ERRONEA`) | 2019 | Pasan a nulo; dim_estacion usa el último nombre válido |
 | Fechas de alta con año de 2 dígitos y reloj de 12 h (`01-01-16 3:45:19 AM`) | usuarios 2016 | Un formato de fecha por año |
 | Coordenadas de destino corridas una columna | 2019 | No se usan para reconciliar |
@@ -123,6 +128,41 @@ El análisis completo, con conclusiones y consultas SQL con DuckDB, está en **[
 ![Perfil horario: laborables vs fin de semana](docs/img/perfil_horario.png)
 
 ![Duración promedio por rango etario y género](docs/img/duracion_rango_genero.png)
+
+### Conclusiones
+
+**¿Cómo cambió el uso entre años?** 2019 fue el año de mayor uso: 6,2 millones de viajes válidos, con picos de
+unos 856 mil por mes en julio y agosto. 2024 tuvo 3,6 millones con una curva más pareja que sube en primavera, y 2016
+tuvo 0,5 millones, con un sistema mucho más chico (99 estaciones contra unas 400). 2019 empieza el 9 de febrero porque
+el dataset publicado no trae enero, así que parte del "crecimiento" de febrero a mayo es un artefacto de los datos.
+
+**¿Cambian las estaciones más usadas de un año a otro?** (pregunta del reporte 2) Sí, pero hay un núcleo estable:
+PACIFICO, CONGRESO y PLAZA ITALIA están en el top 10 los tres años. CONSTITUCION, que no existía en 2016, lidera 2019
+y 2024. En 2024 entran estaciones fuera del microcentro (PLAZA DE LA SHOA, JULIETA LANTERI, BARRANCAS DE BELGRANO),
+coherente con la expansión de la red. El top de 2016 es correcto gracias a la reconciliación de ids
+([D3](DECISIONES.md#d3)): sin ella, varios puestos mostraban el nombre de otra estación.
+
+**¿Cuándo se usa?** De lunes a viernes hay dos picos claros, a las 8 y a las 18, que corresponden a ir y volver del
+trabajo o del estudio. El fin de semana el uso se concentra a la tarde y no tiene picos.
+
+**¿Quién viaja y cuánto?** En todos los rangos etarios los viajes de los hombres son los más cortos (22 a 23 min en
+promedio), los de las mujeres duran 23 a 26 min y los de `OTRO` 25 a 26,5 min. Las diferencias son chicas. Entre el
+10 % y el 13,5 % de los viajes son circulares; 2024 tiene la proporción más alta, lo que sugiere más uso recreativo
+(es una hipótesis: los datos no dicen el motivo del viaje).
+
+**¿Qué tan confiables son los datos?** 2019 y 2024 tienen menos de 0,2 % de rechazos. 2016 tiene 15,7 %, todos por
+viajes sin fecha de devolución, y además su duración informada no tiene relación con las fechas
+([D4](DECISIONES.md#d4)). Por eso 2016 sirve para comparar volúmenes y estaciones, pero con cuidado.
+
+**Limitación más importante.** Solo el 37 % de los viajes con usuario se puede cruzar con `dim_usuario`, porque cada
+archivo de usuarios trae solo las altas de ese año ([D14](DECISIONES.md#d14)). El reporte 3 describe a ese
+subconjunto, no a todos los usuarios del sistema.
+
+**Lo que me llevo.** Lo que más tiempo me llevó no fue programar las capas sino entender los datos. Los tres años
+tienen formatos distintos, y los dos problemas más graves no tiraban ningún error: los ids de estación que cambian
+de significado y la duración de 2016 hubieran dado resultados falsos sin que nada fallara. Separar bronze, silver y gold
+me permitió corregirlas en un solo lugar sin perder el dato original, y la cuarentena con motivo me dejó explicar
+cada fila descartada.
 
 ---
 
@@ -206,3 +246,8 @@ ecobici-pipeline/
 ├── README.md
 └── requirements.txt
 ```
+
+---
+
+Gracias por tomarse el tiempo de revisarlo. Si algo no corre, falta algo o hay alguna duda sobre una decisión,
+avíseme y lo reviso.
