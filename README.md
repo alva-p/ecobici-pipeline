@@ -121,9 +121,15 @@ El análisis completo, con conclusiones y consultas SQL con DuckDB, está en **[
 
 ### Requisitos
 
-- Python 3.12 o superior (probado con 3.12.13)
-- pandas ≥ 2.2 y pyarrow ≥ 15 (probado con pandas 3.1 y pyarrow 26)
-- unos 5 GB de RAM libres y 1 GB de disco para las capas generadas
+| | Versión usada |
+|---|---|
+| Python | **3.12.13** (mínimo 3.11, lo exige pandas 3) |
+| pandas | 3.1.1 |
+| pyarrow | 26.0.1 |
+| numpy | 2.5.5 |
+| matplotlib / duckdb / jupyter | 3.11.2 / 2.0.0 / 1.1.1 (solo para el informe) |
+
+Las versiones están fijadas en [`requirements.txt`](requirements.txt). Hacen falta unos 5 GB de RAM libres y 1 GB de disco para las capas generadas.
 
 ```bash
 git clone https://github.com/alva-p/ecobici-pipeline.git
