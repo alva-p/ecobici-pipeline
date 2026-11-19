@@ -28,7 +28,7 @@ ARCHIVOS = {
 }
 
 
-def leer_crudo(ruta: Path) -> pd.DataFrame:
+def leer_crudo(ruta: Path, **kw) -> pd.DataFrame:
     """Lee un CSV (o el único CSV dentro de un ZIP) sin interpretar ningún valor (D1).
 
     Tres decisiones que tomé acá:
@@ -37,8 +37,9 @@ def leer_crudo(ruta: Path) -> pd.DataFrame:
         Yo quiero que bronze guarde exactamente lo que vino; decidir qué es nulo es trabajo de silver.
       - encoding="utf-8-sig": los CSV de 2024 traen BOM (un carácter invisible al principio).
         Sin esto, la primera columna se llamaría "\\ufeffid_recorrido" en vez de "id_recorrido".
+    Los **kw extra van directo a read_csv: los uso en la exploración para leer solo nrows=1000.
     """
-    opciones = dict(dtype=str, keep_default_na=False, encoding="utf-8-sig")
+    opciones = dict(dtype=str, keep_default_na=False, encoding="utf-8-sig", **kw)
     if ruta.suffix != ".zip":
         return pd.read_csv(ruta, **opciones)
     # Abro el ZIP con zipfile en vez de compression="zip" para poder elegir el archivo.

@@ -67,7 +67,7 @@ una estación distinta según el año**.
 
 ## 1. Exploración de los archivos (Tarea 1)
 
-Abrí cada archivo con pandas y después revisé los datos completos con `value_counts()` y conversiones de prueba.
+Abrí cada archivo con pandas leyendo las primeras 1000 filas ([`src/exploracion.py`](src/exploracion.py), se corre con `python -m src.exploracion`) y después revisé los datos completos con `value_counts()` y conversiones de prueba.
 Estas tablas son la base de todo el mapeo de silver.
 
 ### Recorridos

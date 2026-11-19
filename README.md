@@ -207,6 +207,7 @@ Si falta alguno, `main.py` lo avisa y no arranca. Los datos no están en el repo
 ### Ejecución
 
 ```bash
+python -m src.exploracion            # Tarea 1: mira las primeras 1000 filas de cada archivo
 python main.py                        # pipeline completo, de raw a reportes (~3 min)
 python verificar.py                   # 26 verificaciones sobre reglas y salidas
 python verificar.py --idempotencia    # + corre el pipeline 2 veces y compara (27 en total)
@@ -234,6 +235,7 @@ ecobici-pipeline/
 │   └── gold/reportes/        ← los 5 reportes CSV
 ├── src/
 │   ├── config.py             ← rutas y años
+│   ├── exploracion.py        ← Tarea 1 (nrows=1000), no lo usa main.py
 │   ├── bronze.py
 │   ├── silver.py             ← mapeos por año, normalización, reglas de calidad
 │   ├── gold.py
@@ -246,8 +248,3 @@ ecobici-pipeline/
 ├── README.md
 └── requirements.txt
 ```
-
----
-
-Gracias por tomarse el tiempo de revisarlo. Si algo no corre, falta algo o hay alguna duda sobre una decisión,
-avíseme y lo reviso.

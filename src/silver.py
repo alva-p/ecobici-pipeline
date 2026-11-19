@@ -74,13 +74,13 @@ MAPEO_VIAJES = {
 FORMATO_FECHA_VIAJES = {a: "%Y-%m-%d %H:%M:%S" for a in ANIOS}
 
 # En usuarios solo cambia el nombre del id: en 2019 viene como "ID_usuario" (en mayúsculas).
+# El resto de las columnas se llama igual los tres años, así que las comparto como en viajes.
+_ALTA = {"genero_usuario": "genero", "edad_usuario": "edad", "fecha_alta": "fecha_alta", "hora_alta": "hora_alta"}
 MAPEO_USUARIOS = {
-    2016: {"id_usuario": "id_usuario"},
-    2019: {"ID_usuario": "id_usuario"},
-    2024: {"id_usuario": "id_usuario"},
+    2016: {"id_usuario": "id_usuario", **_ALTA},
+    2019: {"ID_usuario": "id_usuario", **_ALTA},
+    2024: {"id_usuario": "id_usuario", **_ALTA},
 }
-for _m in MAPEO_USUARIOS.values():
-    _m.update(genero_usuario="genero", edad_usuario="edad", fecha_alta="fecha_alta", hora_alta="hora_alta")
 # La fecha de alta viene partida en dos columnas (fecha + hora) y las junto antes de convertir.
 # 2016 es el raro: día-mes-año con año de 2 dígitos y reloj de 12 horas ("01-01-16" + "3:45:19 AM").
 FORMATO_ALTA = {2016: "%d-%m-%y %I:%M:%S %p", 2019: "%Y-%m-%d %H:%M:%S", 2024: "%Y-%m-%d %H:%M:%S"}
