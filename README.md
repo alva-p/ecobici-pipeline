@@ -91,6 +91,15 @@ Los tres años **no comparten formato**. Estos son los problemas que tuvo que re
 | BOM UTF-8 en el encabezado | 2024 | Se lee con `utf-8-sig` |
 | 15,7 % de los viajes sin fecha de devolución | 2016 | Cuarentena `FECHA_INVALIDA` |
 
+En [DECISIONES.md](DECISIONES.md#0-dos-viajes-reales-a-través-de-las-tres-capas) hay **dos viajes reales seguidos
+capa por capa**, los diagramas de la reconciliación y del embudo de calidad, y los gráficos que justifican cada
+decisión. Por ejemplo, este muestra por qué la duración de 2016 no se podía usar:
+
+![Duración 2016 vs 2019](docs/img/d4_duracion_2016.png)
+
+El código está comentado explicando qué hace cada parte y por qué. Cada decisión lleva su número (`D3`, `D4`...),
+que la conecta con su justificación en DECISIONES.md, y desde ahí hay un link de vuelta a la línea de código.
+
 ### Calidad por año
 
 | Año | Bronze | Silver | Cuarentena | % |
@@ -189,7 +198,7 @@ ecobici-pipeline/
 │   ├── silver.py             ← mapeos por año, normalización, reglas de calidad
 │   ├── gold.py
 │   └── reportes.py
-├── docs/img/                 ← gráficos del informe
+├── docs/img/                 ← gráficos del informe y de evidencia de las decisiones
 ├── main.py
 ├── verificar.py
 ├── informe.ipynb
